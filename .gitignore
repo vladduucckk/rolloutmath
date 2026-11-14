@@ -39,5 +39,14 @@ yarn-error.log*
 *.swp
 *.swo
 
-# agent handoff, not part of the product
+# agent / Next scaffolding that is not part of the product
 rolloutmath-handoff.md
+AGENTS.md
+
+# unused create-next-app / shadcn leftovers
+/public/file.svg
+/public/globe.svg
+/public/next.svg
+/public/vercel.svg
+/public/window.svg
+/src/components/ui/card.tsx
