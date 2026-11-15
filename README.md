@@ -148,7 +148,7 @@ Open the URL Next prints (default [http://localhost:4747](http://localhost:4747)
 
 ## What this does not claim
 
-The floor assumes old pods start Ready and stay Ready. A node failure during the rollout can go lower. Terminating pods can briefly push the live pod count above `replicas + maxSurge`; the model follows the replica counts the controller sets, not termination grace.
+The floor assumes old pods start Ready and stay Ready. A node failure during the rollout can go lower. That assumption is printed next to the floor in the UI and in every text/Markdown report, so a copied CI snippet is not read as a broader availability guarantee. Terminating pods can briefly push the live pod count above `replicas + maxSurge`; the model follows the replica counts the controller sets, not termination grace.
 
 Pod requests follow the scheduler's init-container high-water mark (KEP-753), including restartable init containers in list order, pod-level requests, and overhead.
 

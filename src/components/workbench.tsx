@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { analyzeManifest, analyzeWorkload } from "@/lib/analyze";
-import { formatMarkdown } from "@/lib/format";
+import { formatMarkdown, READY_FLOOR_ASSUMPTION } from "@/lib/format";
 import { workloadFromObject } from "@/lib/manifest";
 import { parseCpu, parseMemory } from "@/lib/quantity";
 import type { Report, SimStep, Workload, WorkloadReport } from "@/lib/types";
@@ -639,6 +639,9 @@ function WorkloadResult({ item }: { item: WorkloadReport }) {
               {simulation.newUnready > 0
                 ? `. ${simulation.newUnready} new ${simulation.newUnready === 1 ? "pod stays" : "pods stay"} NotReady (${simulation.totalAtFloor} total).`
                 : "."}
+            </p>
+            <p className="mt-2 text-xs leading-5 text-muted-foreground">
+              {READY_FLOOR_ASSUMPTION}
             </p>
           </div>
           <ol className="flex flex-col gap-3">

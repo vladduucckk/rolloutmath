@@ -2,6 +2,10 @@ import { formatIntOrPercent } from "./quantity";
 import type { Report, WorkloadReport } from "./types";
 import { workloadRef } from "./types";
 
+/** Travels with every copied/CI report so a floor is not read as a broader SLA. */
+export const READY_FLOOR_ASSUMPTION =
+  "Assumption: old pods start Ready and stay Ready. This is a stalled-rollout Ready floor, not a broader availability guarantee — node failures or already-NotReady old pods can go lower.";
+
 export function formatText(report: Report, floor: number | null): string {
   if (report.error) return `${report.error}\n`;
   const blocks = report.workloads.map((item) => formatWorkloadText(item));
@@ -33,6 +37,7 @@ function formatWorkloadText(item: WorkloadReport): string {
     lines.push(
       `  if new pods never become Ready: ${simulation.readyFloor} stay Ready, ${simulation.newUnready} new pods stay NotReady, ${simulation.totalAtFloor} pods total`,
     );
+    lines.push(`  ${READY_FLOOR_ASSUMPTION}`);
     for (const step of simulation.steps) {
       lines.push(`  ${step.sync}. ${step.title}. ${step.detail}`);
     }
@@ -62,6 +67,8 @@ function formatWorkloadMarkdown(item: WorkloadReport): string {
     `## ${ref}`,
     "",
     `${simulation.readyFloor} of ${workload.replicas} pods stay Ready if the new version never becomes Ready. ${simulation.newUnready} new pods stay NotReady (${simulation.totalAtFloor} pods total).`,
+    "",
+    `_${READY_FLOOR_ASSUMPTION}_`,
     "",
     `| step | what the controller does | ready | new, not ready | total |`,
     `| --- | --- | --- | --- | --- |`,

@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 import { analyzeManifest, analyzeWorkload, exitCode } from "./analyze";
+import { formatMarkdown, formatText, READY_FLOOR_ASSUMPTION } from "./format";
 import { effectiveRequests } from "./manifest";
 import { formatCpu, formatMemory, parseCpu, parseMemory, scaleIntOrPercent } from "./quantity";
 import type { Workload } from "./types";
@@ -124,6 +125,30 @@ test("the Kubernetes 1.33 comment: 10 replicas, surge 3, unavailable 2", () => {
     report.findings.find((finding) => finding.code === "EXTRA_REQUESTS")?.message ?? "",
     /500m CPU and 640Mi memory/,
   );
+});
+
+test("text and markdown reports carry the Ready-floor assumption beside the floor", () => {
+  const report = {
+    error: null,
+    workloads: [
+      analyzeWorkload(
+        deployment({
+          replicas: 10,
+          maxSurge: { kind: "absolute", value: 3 },
+          maxUnavailable: { kind: "absolute", value: 2 },
+        }),
+      ),
+    ],
+  };
+  const text = formatText(report, null);
+  const markdown = formatMarkdown(report, null);
+  assert.match(text, /8 stay Ready/);
+  assert.match(markdown, /8 of 10 pods stay Ready/);
+  assert.equal(text.includes(READY_FLOOR_ASSUMPTION), true);
+  assert.equal(markdown.includes(READY_FLOOR_ASSUMPTION), true);
+  const floorLine = markdown.indexOf("8 of 10 pods stay Ready");
+  const assumptionLine = markdown.indexOf(READY_FLOOR_ASSUMPTION);
+  assert.ok(floorLine >= 0 && assumptionLine > floorLine);
 });
 
 test("one replica with maxSurge 0 drops to zero Ready pods", () => {
